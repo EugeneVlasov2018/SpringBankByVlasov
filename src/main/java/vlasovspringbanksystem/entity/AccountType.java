@@ -2,23 +2,25 @@ package vlasovspringbanksystem.entity;
 
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
 
-@Data
 @Entity
-@Table(name = "account_type")
-public class AccountType {
+@Table(name = "account_types")
+@Data
+@NoArgsConstructor
 
+public class AccountType {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Integer id;
 
     @Column(name = "account_type_value", unique = true, nullable = false)
-    private String accTypeValue;
+    private String accountTypeValue;
 
-    @OneToMany(mappedBy = "accountType", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<Account> accountSet = new HashSet<>();
+    @OneToMany(mappedBy = "accountTypes", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Set<Accounts> accounts = new HashSet<>();
 }

@@ -2,30 +2,31 @@ package vlasovspringbanksystem.entity;
 
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 
-@Data
 @Entity
-@Table(name = "credit_opening_request")
+@Table(name = "credit_opening_requests")
+@Data
+@NoArgsConstructor
 public class CreditOpeningRequest {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "user_total_balance", scale = 6, precision = 2)
+    @Column(name = "user_total_balance", columnDefinition = "Decimal(10,2)")
     private BigDecimal userTotalBalance;
 
-    @Column(name = "expected_credit_limit", scale = 6, precision = 2)
+    @Column(name = "expected_credit_limit", columnDefinition = "Decimal(10,2)")
     private BigDecimal expectedCreditLimit;
 
     @Column(name = "date_of_end_credit")
     private Timestamp dateOfEndCredit;
 
     @ManyToOne
-    @JoinColumn(name = "user_login", referencedColumnName = "user_login_email")
+    @JoinColumn(name = "users_login", referencedColumnName = "users_login")
     private Users usersLogin;
 }
