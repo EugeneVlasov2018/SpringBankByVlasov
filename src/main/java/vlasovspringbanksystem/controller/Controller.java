@@ -15,5 +15,4 @@ public class Controller {
         model.addAttribute("name", name);
         return "index";
     }
-
 }
