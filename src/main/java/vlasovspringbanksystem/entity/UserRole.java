@@ -5,14 +5,12 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.util.HashSet;
-import java.util.Set;
+import java.io.Serializable;
 
 @Entity
 @Table(name = "user_roles")
 @Data
-@NoArgsConstructor
-public class UserRole {
+public class UserRole implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -21,6 +19,4 @@ public class UserRole {
     @Column(name = "users_role_value", nullable = false, unique = true)
     private String userRoleValue;
 
-    @OneToMany(mappedBy = "role", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private Set<Users> users = new HashSet<>();
 }
