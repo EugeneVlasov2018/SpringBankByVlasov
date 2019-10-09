@@ -13,7 +13,8 @@ public class LanguageController {
     @PostMapping("/changelang")
     public String setLanguage(HttpSession session, @RequestParam("language") String language) {
         session.setAttribute("currentLang", language);
-        System.out.println(session.getAttribute("currnetLang"));
+        System.out.println("language from param: " + language);
+        System.out.println("lang from session: " + session.getAttribute("currnetLang"));
         return "redirect:/";
     }
 }

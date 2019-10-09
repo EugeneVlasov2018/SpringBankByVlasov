@@ -144,7 +144,10 @@ public class UserController {
 
         Page<PaymentHistory> histories = service.getTotalHistoryForCurrentAcc(
                 accountNumber,
-                PageRequest.of((page - 1), recordsPerPage));//todo пагинировать в обратном порядке
+                PageRequest.of((page - 1), recordsPerPage,
+                        new Sort(Sort.Direction.DESC, "dateOfTransaction")
+                )
+        );
 
         model.addAttribute("history", histories.getContent());
         model.addAttribute("numberOfPage", histories.getTotalPages());
