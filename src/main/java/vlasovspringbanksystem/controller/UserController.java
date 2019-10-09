@@ -2,9 +2,11 @@ package vlasovspringbanksystem.controller;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import vlasovspringbanksystem.entity.Accounts;
 import vlasovspringbanksystem.entity.PaymentHistory;
 import vlasovspringbanksystem.entity.User;
 import vlasovspringbanksystem.service.UserService;
@@ -13,7 +15,6 @@ import javax.servlet.http.HttpSession;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.util.Locale;
 
 @Controller
 public class UserController {
@@ -116,18 +117,23 @@ public class UserController {
 
     @PostMapping("/userpage/payment")//todo прописать валидатор на номер входящего аккаунта
     public String payment(HttpSession session,
+                          Model model,
                           @RequestParam("typeOfTransaction") String typeOfTransaction,
                           @RequestParam("account") String recipientAcc,
                           @RequestParam("money") String money) {
 
         BigDecimal transactionAmount = new BigDecimal(money);
-        if (typeOfTransaction.equals("anotherbank")) {
-            service.doTransaction(Long.valueOf((String) session.getAttribute("accountNumber")), transactionAmount);
-        } else if (typeOfTransaction.equals("currentBank")) {
-            service.doTransaction(Long.valueOf((String) session.getAttribute("accountNumber")),
-                    Long.valueOf(recipientAcc), transactionAmount);
+        if (service.accountHaveEnoughMoney(session, transactionAmount)) {
+            if (typeOfTransaction.equals("anotherbank")) {
+                service.doTransaction(session, transactionAmount);
+            } else if (typeOfTransaction.equals("currentBank")) {
+                service.doTransaction(session, Long.valueOf(recipientAcc), transactionAmount);
+            }
+            return TO_CURRENT_ACC_HISTORY;
+        } else {
+            model.addAttribute("noEnoughMoney", true);
+            return "currentAccOperation";
         }
-        return TO_CURRENT_ACC_HISTORY;
     }
 
     private void preparePage(Long accountNumber, String pageNumber, Model model) {
@@ -138,7 +144,7 @@ public class UserController {
 
         Page<PaymentHistory> histories = service.getTotalHistoryForCurrentAcc(
                 accountNumber,
-                PageRequest.of((page - 1), recordsPerPage));
+                PageRequest.of((page - 1), recordsPerPage));//todo пагинировать в обратном порядке
 
         model.addAttribute("history", histories.getContent());
         model.addAttribute("numberOfPage", histories.getTotalPages());

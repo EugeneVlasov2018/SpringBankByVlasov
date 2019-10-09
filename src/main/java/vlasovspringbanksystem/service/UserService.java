@@ -14,6 +14,7 @@ import vlasovspringbanksystem.entity.PaymentHistory;
 import vlasovspringbanksystem.entity.User;
 import vlasovspringbanksystem.utils.EntityCreator;
 import vlasovspringbanksystem.utils.TypeOfOperation;
+import vlasovspringbanksystem.utils.exceptions.NoEnoughMoneyException;
 import vlasovspringbanksystem.utils.generators.AccountNumberGenerator;
 
 import javax.servlet.http.HttpSession;
@@ -109,11 +110,52 @@ public class UserService {
         paymentDao.saveCurrentAction(currentAction);
     }
 
-    public void doTransaction(Long accountNumber, BigDecimal transactionAmount) {
+    public void doTransaction(HttpSession session, BigDecimal transactionAmount) {
+        Long accountNumber = Long.valueOf((String) session.getAttribute("accountNumber"));
+        Accounts account = accountDao.getCurrentAccount(accountNumber);
 
+        BigDecimal balance = account.getCurrentBalance().subtract(transactionAmount);
+        account.setCurrentBalance(balance);
+
+        PaymentHistory currentAction = creator.getNewAction(session, TypeOfOperation.FOREIGN_BANK_PAYMENT,
+                account, transactionAmount);
+
+        accountDao.setCurrentAcc(balance, accountNumber);
+        paymentDao.saveCurrentAction(currentAction);
     }
 
-    public void doTransaction(Long accountNumber, Long recipientAccount, BigDecimal transactionAmount) {
 
+    public void doTransaction(HttpSession session, Long recipientAccount, BigDecimal transactionAmount) {
+        Long accountNumber = Long.valueOf((String) session.getAttribute("accountNumber"));
+        Accounts donorAcc = accountDao.getCurrentAccount(accountNumber);
+        Accounts recipientAcc = accountDao.getCurrentAccount(recipientAccount);
+
+        BigDecimal donorBalance = donorAcc.getCurrentBalance().subtract(transactionAmount);
+        BigDecimal recipientBalance = recipientAcc.getCurrentBalance().add(transactionAmount);
+
+        donorAcc.setCurrentBalance(donorBalance);
+        recipientAcc.setCurrentBalance(recipientBalance);
+
+        PaymentHistory donorAction = creator.getNewAction(session, TypeOfOperation.INTRABANK_PAYMENT,
+                donorAcc, transactionAmount);
+        PaymentHistory recipientAction = creator.getNewAction(session, TypeOfOperation.INCOMING_PAYMENT,
+                recipientAcc, transactionAmount);
+
+        accountDao.setCurrentAcc(donorBalance, accountNumber);
+        accountDao.setCurrentAcc(recipientBalance, recipientAcc.getAccountNumber());
+
+        paymentDao.saveCurrentAction(donorAction);
+        paymentDao.saveCurrentAction(recipientAction);
+    }
+
+    public boolean accountHaveEnoughMoney(HttpSession session, BigDecimal transactionAmount) {
+
+        Long accountNumber = Long.valueOf((String) session.getAttribute("accountNumber"));
+        Accounts account = accountDao.getCurrentAccount(accountNumber);
+
+        BigDecimal currentBal = account.getCurrentBalance();
+        BigDecimal creditLimit = account.getCreditLimit().negate();
+
+        return (currentBal.add(creditLimit).subtract(transactionAmount).signum() > 0);
     }
 }

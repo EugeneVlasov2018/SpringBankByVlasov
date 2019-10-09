@@ -22,17 +22,34 @@ public class AuthFilter implements Filter {
         HttpServletResponse response = (HttpServletResponse) servletResponse;
         HttpSession session = request.getSession();
         User userFromSession = (User) session.getAttribute("user");
-        if (userFromSession != null) {
-            filterChain.doFilter(servletRequest, servletResponse);
-        } else {
-            String login = request.getParameter("login");
-            String password = request.getParameter("password");
-
-            if (login != null && password != null) {
-                filterChain.doFilter(servletRequest, servletResponse);
+        if (!request.getRequestURI().equals("/changelang")) {
+            if (userFromSession != null) {
+                if (request.getRequestURI().startsWith("/userpage")) {
+                    if (userFromSession.getRole().getUserRoleValue().equals("user"))
+                        filterChain.doFilter(servletRequest, servletResponse);
+                    else
+                        response.sendRedirect("/adminpage");
+                } else if (request.getRequestURI().startsWith("/adminpage")) {
+                    if (userFromSession.getRole().getUserRoleValue().equals("admin"))
+                        filterChain.doFilter(servletRequest, servletResponse);
+                    else
+                        response.sendRedirect("/userpage");
+                }
             } else {
-                request.getRequestDispatcher(INDEX_PAGE).forward(request, response);
+                String login = request.getParameter("login");
+                String password = request.getParameter("password");
+
+                if (login != null && password != null) {
+                    filterChain.doFilter(servletRequest, servletResponse);
+                } else {
+                    if (request.getRequestURI().equals("/"))
+                        request.getRequestDispatcher(INDEX_PAGE).forward(request, response);
+                    else
+                        response.sendRedirect("/");
+                }
             }
+        } else {
+            filterChain.doFilter(servletRequest, servletResponse);
         }
     }
 }
