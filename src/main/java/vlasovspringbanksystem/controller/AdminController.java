@@ -51,8 +51,8 @@ public class AdminController {
     }
 
     @PostMapping("/adminpage/confirmrequest")
-    public String confirmUserRequest(@RequestParam("requestId") String id) {
-        service.createCreditAccount(id);
+    public String confirmUserRequest(HttpSession session, @RequestParam("requestId") String id) {
+        service.createCreditAccount(id, session);
         return TO_ADMINPAGE;
     }
 

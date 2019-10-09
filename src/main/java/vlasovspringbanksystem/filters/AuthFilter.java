@@ -36,7 +36,7 @@ public class AuthFilter implements Filter {
                         response.sendRedirect("/userpage");
                 } else {
                     //response.sendRedirect("/");
-                    //request.getRequestDispatcher(INDEX_PAGE).forward(servletRequest,servletResponse);
+                    request.getRequestDispatcher(INDEX_PAGE).forward(servletRequest, servletResponse);
                 }
             } else {
                 String login = request.getParameter("login");

@@ -73,7 +73,7 @@ public class AdminService {
         }
     }
 
-    public void createCreditAccount(String id) {
+    public void createCreditAccount(String id, HttpSession session) {
         CreditOpeningRequest request = requestDao.getRequestById(Integer.valueOf(id)).get();
 
         User requestOwner = request.getUserLogin();
@@ -86,11 +86,13 @@ public class AdminService {
                 accTypeDao.getAccTypeByValue("credit"),
                 request.getExpectedCreditLimit().negate());
 
-        //PaymentHistory firsAction = creator.getNewCreditAction()
+        PaymentHistory firsAction = creator.getNewAction(session, TypeOfOperation.CREATE_CREDIT_ACC, creditAccount,
+                new BigDecimal("0"));
 
         requestDao.deleteRequestById(request.getId());
         userDao.setAllStatusesOfCurrentUser(requestOwner);
         accountDao.saveCurrentAccount(creditAccount);
+        payDao.saveCurrentAction(firsAction);
     }
 
     public void deleteRequest(String id) {

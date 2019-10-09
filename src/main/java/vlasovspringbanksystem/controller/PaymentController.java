@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 import vlasovspringbanksystem.service.UserService;
+import vlasovspringbanksystem.utils.exceptions.UnexistUserException;
 import vlasovspringbanksystem.utils.exceptions.ZeroException;
 
 import javax.servlet.http.HttpSession;
@@ -71,5 +72,14 @@ public class PaymentController {//todo errors BigDecimal
         modelAndView.setViewName(SEND_MONEY_PAGE);
         return modelAndView;
     }
+
+    @ExceptionHandler(UnexistUserException.class)
+    public ModelAndView palIsZero(UnexistUserException e) {
+        ModelAndView modelAndView = new ModelAndView();
+        modelAndView.addObject("noExistAccount", true);
+        modelAndView.setViewName(SEND_MONEY_PAGE);
+        return modelAndView;
+    }
+
 
 }

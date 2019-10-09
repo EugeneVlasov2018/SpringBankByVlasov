@@ -38,6 +38,10 @@
             <input type="submit" value="<fmt:message key="button.creditrequest"/>"
                    class="waves-effect waves-light btn"/>
         </form>
+        <c:if test="${requestScope.zeropal==true}">
+            <fmt:message key="pal.is.zero"/><br>
+        </c:if>
+        <br>
     </c:if>
 </div>
 </body>

@@ -12,6 +12,7 @@ import vlasovspringbanksystem.entity.PaymentHistory;
 import vlasovspringbanksystem.entity.User;
 import vlasovspringbanksystem.utils.EntityCreator;
 import vlasovspringbanksystem.utils.TypeOfOperation;
+import vlasovspringbanksystem.utils.exceptions.UnexistUserException;
 import vlasovspringbanksystem.utils.exceptions.ZeroException;
 import vlasovspringbanksystem.utils.generators.AccountNumberGenerator;
 
@@ -109,6 +110,7 @@ public class UserService {
 
         Accounts currrentAccount = accountDao.getCurrentAccount(accountNumber);
         BigDecimal accountsBalance = currrentAccount.getCurrentBalance().add(summForRefill);
+        currrentAccount.setCurrentBalance(accountsBalance);
 
         PaymentHistory currentAction = creator.getNewAction(session,
                 TypeOfOperation.REFILL_ACC, currrentAccount, summForRefill);
@@ -142,6 +144,10 @@ public class UserService {
         Long accountNumber = Long.valueOf((String) session.getAttribute("accountNumber"));
         Accounts donorAcc = accountDao.getCurrentAccount(accountNumber);
         Accounts recipientAcc = accountDao.getCurrentAccount(recipientAccount);
+
+        if (recipientAcc == null) {
+            throw new UnexistUserException();
+        }
 
         BigDecimal donorBalance = donorAcc.getCurrentBalance().subtract(transactionAmount);
         BigDecimal recipientBalance = recipientAcc.getCurrentBalance().add(transactionAmount);

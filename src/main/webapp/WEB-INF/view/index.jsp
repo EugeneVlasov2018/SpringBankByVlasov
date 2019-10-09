@@ -50,7 +50,7 @@
     </div>
 <br>
     <div class="center-align">
-    <form method="post" action="${pageContext.request.contextPath}">
+        <form method="post" action="/">
         <label>
             <input hidden name="command" value="loginUser">
         </label>

@@ -55,9 +55,4 @@ public class LogInController {
             return REDIRECT_USERPAGE;
         else throw new RuntimeException("What are you?!");
     }
-
-    public ModelAndView loginError(RuntimeException e) {
-        return null;
-    }
-
 }
