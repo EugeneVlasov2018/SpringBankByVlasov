@@ -13,14 +13,18 @@
 <html>
 <head>
     <title>Title</title>
+    <jsp:include page="setup.jsp"/>
 </head>
 <body>
-<form method="post" action="${pageContext.request.contextPath}refillacc">
-    <label>
-        <input type="text" name="summ" placeholder="<fmt:message key="summ"/>" pattern="^[0-9]*[.,]?[0-9]+$" required>
-    </label>
-    <fmt:message key="positive.number"/><br>
-    <input type="submit" value="<fmt:message key="button.refill"/> ">
-</form>
+<div class="container">
+    <form method="post" action="${pageContext.request.contextPath}refillacc">
+        <label>
+            <input type="text" name="summ" placeholder="<fmt:message key="summ"/>" pattern="^[0-9]*[.,]?[0-9]+$"
+                   required>
+        </label>
+        <fmt:message key="positive.number"/><br>
+        <input type="submit" value="<fmt:message key="button.refill"/> " class="waves-effect waves-light btn"/>
+    </form>
+</div>
 </body>
 </html>

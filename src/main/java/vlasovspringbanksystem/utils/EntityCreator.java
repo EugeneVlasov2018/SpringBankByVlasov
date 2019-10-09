@@ -53,11 +53,13 @@ public class EntityCreator {
                 .build();
 
         if (type.getAccountTypeValue().equals("deposit")) {
+            result.setCreditLimit(new BigDecimal("0"));
             result.setDeposit(initialPal);
             result.setInterestRate(DEPOSIT_RATE);
             result.setAccountValidity(Timestamp.valueOf(LocalDateTime.now().plusYears(1)));
         } else if (type.getAccountTypeValue().equals("credit")) {
             result.setCreditLimit(initialPal);
+            result.setDeposit(new BigDecimal("0"));
             result.setInterestRate(CREDIT_RATE);
             result.setAccountValidity(Timestamp.valueOf(LocalDateTime.now().plusMonths(6)));
         }

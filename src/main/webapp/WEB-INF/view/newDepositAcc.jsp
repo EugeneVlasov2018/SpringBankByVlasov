@@ -14,14 +14,20 @@
 <html>
 <head>
     <title>Title</title>
+    <jsp:include page="setup.jsp"/>
 </head>
 <body>
-<form method="post" action="">
-    <label>
-        <input name="deposit" type="text" pattern="^[0-9]*[.,]?[0-9]+$" placeholder="<fmt:message key="initial.fee"/>">
-    </label>
-    <input type="submit" value="<fmt:message key="create.depositacc"/> ">
-</form>
-
+<div class="container">
+    <form method="post" action="">
+        <label>
+            <input name="deposit" type="text" placeholder="<fmt:message key="initial.fee"/>"/>
+        </label>
+        <c:if test="${requestScope.zeropal==true}">
+            <fmt:message key="pal.is.zero"/><br>
+        </c:if>
+        <input type="submit" value="<fmt:message key="create.depositacc"/> "
+               class="waves-effect waves-light btn-small"/>
+    </form>
+</div>
 </body>
 </html>

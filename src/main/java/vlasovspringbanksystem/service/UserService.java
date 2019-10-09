@@ -1,32 +1,29 @@
 package vlasovspringbanksystem.service;
 
+import org.joda.time.LocalDate;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import vlasovspringbanksystem.dao.IAccountDao;
-import vlasovspringbanksystem.dao.IAccountTypeDao;
-import vlasovspringbanksystem.dao.ICreditOpeningRequestDao;
-import vlasovspringbanksystem.dao.IPaymentHistoryDao;
+import vlasovspringbanksystem.dao.*;
 import vlasovspringbanksystem.entity.Accounts;
 import vlasovspringbanksystem.entity.CreditOpeningRequest;
 import vlasovspringbanksystem.entity.PaymentHistory;
 import vlasovspringbanksystem.entity.User;
 import vlasovspringbanksystem.utils.EntityCreator;
 import vlasovspringbanksystem.utils.TypeOfOperation;
-import vlasovspringbanksystem.utils.exceptions.NoEnoughMoneyException;
+import vlasovspringbanksystem.utils.exceptions.ZeroException;
 import vlasovspringbanksystem.utils.generators.AccountNumberGenerator;
 
 import javax.servlet.http.HttpSession;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
-import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Locale;
 
 @Service
 @Transactional
 public class UserService {
+    private IUserDao userDao;
     private IAccountDao accountDao;
     private IAccountTypeDao accTypeDao;
     private IPaymentHistoryDao paymentDao;
@@ -34,9 +31,10 @@ public class UserService {
     private AccountNumberGenerator generator;
     private EntityCreator creator;
 
-    public UserService(IAccountDao accountDao, IAccountTypeDao accTypeDao,
+    public UserService(IUserDao userDao, IAccountDao accountDao, IAccountTypeDao accTypeDao,
                        IPaymentHistoryDao paymentDao, ICreditOpeningRequestDao requestDao,
                        AccountNumberGenerator generator, EntityCreator creator) {
+        this.userDao = userDao;
         this.accountDao = accountDao;
         this.accTypeDao = accTypeDao;
         this.paymentDao = paymentDao;
@@ -50,15 +48,17 @@ public class UserService {
         return accountDao.getAllAccountsForCurrentUserByType(usersLogin, typeOfAccount);
     }
 
-    public void createNewDepositAccount(HttpSession session, String deposit, User currentUser) {
-        BigDecimal depositPal = new BigDecimal(deposit.replace(',', '.'));
+    public void createNewDepositAccount(HttpSession session, BigDecimal deposit, User currentUser) {
+        if (deposit.signum() == 0 || deposit.signum() < 0)
+            throw new ZeroException();
+
         Long accountNumber = generator.getAccountNumber(accountDao.getAllAccounts());
 
         Accounts newAccount = creator.getNewAccount(currentUser, accountNumber,
-                accTypeDao.getAccTypeByValue("deposit"), depositPal);
+                accTypeDao.getAccTypeByValue("deposit"), deposit);
 
         PaymentHistory firstAction = creator.getNewAction(session, TypeOfOperation.CREATE_DEPOSIT_ACC,
-                newAccount, depositPal);
+                newAccount, deposit);
 
         accountDao.saveCurrentAccount(newAccount);
         paymentDao.saveCurrentAction(firstAction);
@@ -66,8 +66,9 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public BigDecimal getTotalDepositAfterHalfYear(User user, LocalDateTime dateAfter6monts) {
-        Timestamp dateAfter6 = Timestamp.valueOf(dateAfter6monts);
+    public BigDecimal getTotalDepositAfterHalfYear(User user, LocalDate dateAfter6monts) {
+        Timestamp dateAfter6 = new Timestamp(dateAfter6monts.toDateTimeAtStartOfDay().getMillis());
+
         List<Accounts> totalBalance = accountDao.getAllAccsOlderThanCurrentDate(user.getUsersLogin(), dateAfter6);
 
         BigDecimal result = new BigDecimal("0");
@@ -75,12 +76,14 @@ public class UserService {
         for (Accounts currentAcc : totalBalance) {
             result = result.add(currentAcc.getDeposit());
         }
-
         return result;
     }
 
     public void createCreditOpeningRequest(User currentUser, BigDecimal creditLimit,
                                            BigDecimal balance, Timestamp creditAccValidity) {
+        if (creditLimit.signum() == 0 || creditLimit.signum() < 0)
+            throw new ZeroException();
+
         CreditOpeningRequest currentRequest = CreditOpeningRequest.getBuilder()
                 .setId(null)
                 .setUserLogin(currentUser)
@@ -92,6 +95,7 @@ public class UserService {
         currentUser.setCreditRequestStatus(true);
 
         requestDao.saveCurrentRequest(currentRequest);
+        userDao.setRequestStatusesOfCurrentUser(currentUser);
     }
 
     @Transactional(readOnly = true)
@@ -100,6 +104,9 @@ public class UserService {
     }
 
     public void refillCurrentAcc(HttpSession session, Long accountNumber, BigDecimal summForRefill) {
+        if (summForRefill.signum() == 0 || summForRefill.signum() < 0)
+            throw new ZeroException();
+
         Accounts currrentAccount = accountDao.getCurrentAccount(accountNumber);
         BigDecimal accountsBalance = currrentAccount.getCurrentBalance().add(summForRefill);
 
@@ -111,6 +118,9 @@ public class UserService {
     }
 
     public void doTransaction(HttpSession session, BigDecimal transactionAmount) {
+        if (transactionAmount.signum() == 0 || transactionAmount.signum() < 0)
+            throw new ZeroException();
+
         Long accountNumber = Long.valueOf((String) session.getAttribute("accountNumber"));
         Accounts account = accountDao.getCurrentAccount(accountNumber);
 
@@ -126,6 +136,9 @@ public class UserService {
 
 
     public void doTransaction(HttpSession session, Long recipientAccount, BigDecimal transactionAmount) {
+        if (transactionAmount.signum() == 0 || transactionAmount.signum() < 0)
+            throw new ZeroException();
+
         Long accountNumber = Long.valueOf((String) session.getAttribute("accountNumber"));
         Accounts donorAcc = accountDao.getCurrentAccount(accountNumber);
         Accounts recipientAcc = accountDao.getCurrentAccount(recipientAccount);

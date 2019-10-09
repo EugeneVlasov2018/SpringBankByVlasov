@@ -9,16 +9,13 @@ import vlasovspringbanksystem.entity.PaymentHistory;
 import vlasovspringbanksystem.entity.User;
 import vlasovspringbanksystem.utils.EntityCreator;
 import vlasovspringbanksystem.utils.TypeOfOperation;
+import vlasovspringbanksystem.utils.exceptions.UserIsExistException;
+import vlasovspringbanksystem.utils.exceptions.ZeroException;
 import vlasovspringbanksystem.utils.generators.AccountNumberGenerator;
-import vlasovspringbanksystem.utils.generators.PasswordGenerator;
 
 import javax.servlet.http.HttpSession;
 import java.math.BigDecimal;
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Locale;
-import java.util.Map;
 
 @Service
 @Transactional
@@ -54,18 +51,54 @@ public class AdminService {
 
     public void createNewUser(HttpSession session, String fName,
                               String lName, String login,
-                              String password, String deposit) {
-        BigDecimal currentPal = new BigDecimal(deposit.replace(',', '.'));
+                              String password, BigDecimal deposit) {
+
+        if (deposit.signum() == 0 || deposit.signum() < 0)
+            throw new ZeroException();
+
         Long accountNumber = numberGenerator.getAccountNumber(accountDao.getAllAccounts());
 
-        User currentUser = creator.getNewUser(fName, lName, login, roleDao.getRoleByValue("user"), password);
-        Accounts newAccount = creator.getNewAccount(currentUser, accountNumber,
-                accTypeDao.getAccTypeByValue("deposit"), currentPal);
-        PaymentHistory firstAction = creator.getNewAction(session, TypeOfOperation.CREATE_DEPOSIT_ACC,
-                newAccount, currentPal);
+        if (userDao.getUserByLogin(login) == null) {
+            User currentUser = creator.getNewUser(fName, lName, login, roleDao.getRoleByValue("user"), password);
+            Accounts newAccount = creator.getNewAccount(currentUser, accountNumber,
+                    accTypeDao.getAccTypeByValue("deposit"), deposit);
+            PaymentHistory firstAction = creator.getNewAction(session, TypeOfOperation.CREATE_DEPOSIT_ACC,
+                    newAccount, deposit);
 
-        userDao.addNewUser(currentUser);
-        accountDao.saveCurrentAccount(newAccount);
-        payDao.saveCurrentAction(firstAction);
+            userDao.addNewUser(currentUser);
+            accountDao.saveCurrentAccount(newAccount);
+            payDao.saveCurrentAction(firstAction);
+        } else {
+            throw new UserIsExistException();
+        }
+    }
+
+    public void createCreditAccount(String id) {
+        CreditOpeningRequest request = requestDao.getRequestById(Integer.valueOf(id)).get();
+
+        User requestOwner = request.getUserLogin();
+        requestOwner.setHaveCreditAcc(true);
+        requestOwner.setCreditRequestStatus(false);
+
+        Accounts creditAccount = creator.getNewAccount(
+                requestOwner,
+                numberGenerator.getAccountNumber(accountDao.getAllAccounts()),
+                accTypeDao.getAccTypeByValue("credit"),
+                request.getExpectedCreditLimit().negate());
+
+        //PaymentHistory firsAction = creator.getNewCreditAction()
+
+        requestDao.deleteRequestById(request.getId());
+        userDao.setAllStatusesOfCurrentUser(requestOwner);
+        accountDao.saveCurrentAccount(creditAccount);
+    }
+
+    public void deleteRequest(String id) {
+        CreditOpeningRequest request = requestDao.getRequestById(Integer.valueOf(id)).get();
+        User currentUser = request.getUserLogin();
+        currentUser.setCreditRequestStatus(false);
+
+        requestDao.deleteRequestById(request.getId());
+        userDao.setRequestStatusesOfCurrentUser(currentUser);
     }
 }

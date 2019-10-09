@@ -10,7 +10,7 @@ import org.springframework.web.servlet.ModelAndView;
 import vlasovspringbanksystem.entity.User;
 import vlasovspringbanksystem.service.AuthentificationService;
 
-@Controller
+@Controller//todo wrong login exception
 @SessionAttributes(value = "user")
 public class LogInController {
     private AuthentificationService service;

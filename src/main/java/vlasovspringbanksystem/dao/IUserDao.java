@@ -10,4 +10,8 @@ public interface IUserDao {
     public void addNewUser(User newUser);
 
     User getUserByLogin(String login);
+
+    void setAllStatusesOfCurrentUser(User requestOwner);
+
+    void setRequestStatusesOfCurrentUser(User currentUser);
 }

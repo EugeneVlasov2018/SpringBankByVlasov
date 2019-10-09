@@ -13,28 +13,32 @@
 <html>
 <head>
     <title>Title</title>
+    <jsp:include page="setup.jsp"/>
 </head>
 <body>
-<c:if test="${sessionScope.user.haveCreditAcc == true}">
-    <fmt:message key="user.alerady.have.creditAcc"/>
-</c:if>
-<c:if test="${sessionScope.user.haveCreditAcc == false}">
-    <fmt:message key="recomendation"/>
-    <br>
-    <fmt:message key="your.balance"/>
-    <c:out value="${requestScope.summaryBalance}"/>
-    <fmt:message key="after"/>
-    <c:out value="${requestScope.afterHalfYearData}"/>
-    <br>
-    <form method="post">
-        <input name="totalUserBalance" type="hidden" value="${requestScope.summaryBalance}">
-        <input name="DataForCreditAcc" type="hidden" value="${requestScope.afterHalfYearData}">
-        <label>
-            <input name="creditLimit" placeholder="<fmt:message key="credit.limit"/>" type="text"
-                   pattern="^[0-9]*[.,]?[0-9]+$">
-        </label>
-        <input type="submit" value="<fmt:message key="button.creditrequest"/>">
-    </form>
-</c:if>
+<div class="container">
+    <c:if test="${sessionScope.user.haveCreditAcc == true}">
+        <fmt:message key="user.alerady.have.creditAcc"/>
+    </c:if>
+    <c:if test="${sessionScope.user.haveCreditAcc == false}">
+        <fmt:message key="recomendation"/>
+        <br>
+        <fmt:message key="your.balance"/>
+        <c:out value="${requestScope.summaryBalance}"/>
+        <fmt:message key="after"/>
+        <c:out value="${requestScope.afterHalfYearData}"/>
+        <br>
+        <form method="post">
+            <input name="totalUserBalance" type="hidden" value="${requestScope.summaryBalance}">
+            <input name="DataForCreditAcc" type="hidden" value="${requestScope.afterHalfYearData}">
+            <label>
+                <input name="creditLimit" placeholder="<fmt:message key="credit.limit"/>" type="text"
+                       pattern="^[0-9]*[.,]?[0-9]+$">
+            </label>
+            <input type="submit" value="<fmt:message key="button.creditrequest"/>"
+                   class="waves-effect waves-light btn"/>
+        </form>
+    </c:if>
+</div>
 </body>
 </html>

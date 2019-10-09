@@ -28,4 +28,16 @@ public class UserDaoImpl implements IUserDao {
     public User getUserByLogin(String login) {
         return repository.findByUsersLogin(login);
     }
+
+    @Override
+    public void setAllStatusesOfCurrentUser(User requestOwner) {
+        repository.setUserStatusesById(requestOwner.getId(),
+                requestOwner.getCreditRequestStatus(),
+                requestOwner.getHaveCreditAcc());
+    }
+
+    @Override
+    public void setRequestStatusesOfCurrentUser(User currentUser) {
+        repository.setCreditRequestStatusOfCurrentUser(currentUser.getId(), currentUser.getCreditRequestStatus());
+    }
 }

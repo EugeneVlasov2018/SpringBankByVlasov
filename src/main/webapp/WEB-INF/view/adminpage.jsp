@@ -14,9 +14,10 @@
 <html>
 <head>
     <title>Title</title>
+    <jsp:include page="setup.jsp"/>
 </head>
 <body>
-<!--зафигачить useBeanБ взяв имя фамилию юзера из сессии для приветствия-->
+<div class="container">
 <fmt:message key="greeting"/>
 <c:out value="${sessionScope.user.firstName} ${sessionScope.user.lastName}))"/><br>
 
@@ -45,17 +46,19 @@
                 <td>
                     <form method="post" action="${pageContext.request.contextPath}adminpage/confirmrequest">
                         <label>
-                            <input hidden name="requestId" value="${request.requestId}"/>
+                            <input hidden name="requestId" value="${request.id}"/>
                         </label>
-                        <input type="submit" value="<fmt:message key="accept.request"/>">
+                        <input type="submit" value="<fmt:message key="accept.request"/>"
+                               class="waves-effect waves-light btn">
                     </form>
                 </td>
                 <td>
                     <form method="post" action="${pageContext.request.contextPath}adminpage/deleterequest">
                         <label>
-                            <input hidden name="requestId" value="${request.requestId}"/>
+                            <input hidden name="requestId" value="${request.id}"/>
                         </label>
-                        <input type="submit" value="<fmt:message key="delete.request"/> ">
+                        <input type="submit" value="<fmt:message key="delete.request"/>"
+                               class="waves-effect waves-light btn"/>
                     </form>
                 </td>
             </tr>
@@ -65,9 +68,10 @@
 <br>
 <br>
 <form method="get" action="${pageContext.request.contextPath}adminpage/newuserpage">
-    <input type="submit" value="<fmt:message key="newUser.button" />">
+    <input type="submit" value="<fmt:message key="newUser.button" />" class="waves-effect waves-light btn"/>
 </form>
 <br>
 <jsp:include page="logout.jsp"/>
+</div>
 </body>
 </html>

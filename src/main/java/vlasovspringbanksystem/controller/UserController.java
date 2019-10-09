@@ -6,27 +6,17 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import vlasovspringbanksystem.entity.Accounts;
 import vlasovspringbanksystem.entity.PaymentHistory;
 import vlasovspringbanksystem.entity.User;
 import vlasovspringbanksystem.service.UserService;
 
 import javax.servlet.http.HttpSession;
-import java.math.BigDecimal;
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
 
 @Controller
 public class UserController {
     private UserService service;
     private final static String USERPAGE = "userpage";
-    private final static String NEW_DEPOSIT_ACC_PAGE = "newDepositAcc";
-    private final static String TO_USERPAGE = "redirect:/userpage";
-    private final static String TO_CURRENT_ACC_HISTORY = "redirect:/userpage/accountoperation";
-    private final static String CREDIT_REQUEST_PAGE = "creditrequestform";
     private final static String CURRENT_ACC_HISTORY_PAGE = "userhistorypage";
-    private final static String REFILL_ACCOUNT = "addmoneypage";
-    private final static String SEND_MONEY_PAGE = "currentAccOperation";
 
     public UserController(UserService service) {
         this.service = service;
@@ -43,44 +33,6 @@ public class UserController {
         return USERPAGE;
     }
 
-    @GetMapping("userpage/createaccount")
-    public String getNewDepositAccPage() {
-        return NEW_DEPOSIT_ACC_PAGE;
-    }
-
-    @PostMapping("userpage/createaccount")//todo реализовать валидатор на ненулевой депозит
-    public String createDepositAccPage(@RequestParam("deposit") String deposit,
-                                       HttpSession session) {
-        service.createNewDepositAccount(session, deposit, (User) session.getAttribute("user"));
-        return TO_USERPAGE;
-    }
-
-    @GetMapping("userpage/createcreditacc")
-    public String getCreditRequestPage(HttpSession session, Model model) {
-        LocalDateTime dateAfter6monts = LocalDateTime.now().plusMonths(6);
-
-        model.addAttribute("summaryBalance", service.getTotalDepositAfterHalfYear(
-                (User) session.getAttribute("user"), dateAfter6monts));
-        model.addAttribute("afterHalfYearData", dateAfter6monts);
-        return CREDIT_REQUEST_PAGE;
-    }
-
-    @PostMapping("userpage/createcreditacc")
-    public String sendCreditRequestToAdmin(@RequestParam("totalUserBalance") String totalbalance,
-                                           @RequestParam("DataForCreditAcc") String dataForAcc,
-                                           @RequestParam("creditLimit") String creditLimit,
-                                           HttpSession session,
-                                           Model model) {
-        User currentUser = (User) session.getAttribute("user");
-        BigDecimal creditOfLimit = new BigDecimal(creditLimit.replace(',', '.'));
-        BigDecimal balance = new BigDecimal(totalbalance.replace(',', '.'));
-        Timestamp creditAccValidity = Timestamp.valueOf(dataForAcc); //todo преобразование в дату не работает
-        service.createCreditOpeningRequest(currentUser, creditOfLimit, balance, creditAccValidity);
-        currentUser.setCreditRequestStatus(true);
-        session.setAttribute("user", currentUser);
-        return TO_USERPAGE;
-    }
-
     @GetMapping("/userpage/accountoperation")
     public String getCurrentAccountHistory(HttpSession session,
                                            Model model,
@@ -94,46 +46,6 @@ public class UserController {
         }
         preparePage(Long.valueOf(accountNumber), pageNumber, model);
         return CURRENT_ACC_HISTORY_PAGE;
-    }
-
-
-    @GetMapping("/userpage/workwithaccount")
-    public String selectOperationMenu(@RequestParam("typeofwork") String typeOfOperation) {
-        String currentMenu = "";
-        if (typeOfOperation.equals("addmoney"))
-            currentMenu = REFILL_ACCOUNT;
-        else if (typeOfOperation.equals("sendmoney"))
-            currentMenu = SEND_MONEY_PAGE;
-        return currentMenu;
-    }
-
-    @PostMapping("/userpage/refillacc")
-    public String refillAccount(HttpSession session, @RequestParam("summ") String summ) {
-        BigDecimal summForRefill = new BigDecimal(summ);
-        Long accountNumber = Long.valueOf((String) session.getAttribute("accountNumber"));
-        service.refillCurrentAcc(session, accountNumber, summForRefill);
-        return TO_CURRENT_ACC_HISTORY;
-    }
-
-    @PostMapping("/userpage/payment")//todo прописать валидатор на номер входящего аккаунта
-    public String payment(HttpSession session,
-                          Model model,
-                          @RequestParam("typeOfTransaction") String typeOfTransaction,
-                          @RequestParam("account") String recipientAcc,
-                          @RequestParam("money") String money) {
-
-        BigDecimal transactionAmount = new BigDecimal(money);
-        if (service.accountHaveEnoughMoney(session, transactionAmount)) {
-            if (typeOfTransaction.equals("anotherbank")) {
-                service.doTransaction(session, transactionAmount);
-            } else if (typeOfTransaction.equals("currentBank")) {
-                service.doTransaction(session, Long.valueOf(recipientAcc), transactionAmount);
-            }
-            return TO_CURRENT_ACC_HISTORY;
-        } else {
-            model.addAttribute("noEnoughMoney", true);
-            return "currentAccOperation";
-        }
     }
 
     private void preparePage(Long accountNumber, String pageNumber, Model model) {

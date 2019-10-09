@@ -8,6 +8,9 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" pageEncoding="UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+
+<!-- Compiled and minified CSS -->
+
 <c:if test="${not empty sessionScope.currentLang}">
     <fmt:setLocale value="${sessionScope.currentLang}" scope="session"/>
 </c:if>
@@ -19,25 +22,34 @@
 <html>
 <head>
     <title>Title</title>
+    <jsp:include page="setup.jsp"/>
 </head>
 <body>
-<div align="center">
+<div class="container">
+    <div class="center-align">
     <fmt:message key="main.message.index"/>
 </div>
 <br>
 <br>
-<fmt:message key="choose.language"/><br>
-<form action="${pageContext.request.contextPath}/changelang" method="post">
-    <label>
-        <select name="language">
-            <option value="ru_RU">русский</option>
-            <option value="en_EN">english</option>
-        </select>
-        <input type="submit" value="<fmt:message key="lang.button"/>"/>
-    </label>
-</form>
+
+    <div class="row">
+        <div class="col s8"></div>
+        <div class="col s4">
+            <form action="${pageContext.request.contextPath}/changelang" method="post">
+
+                <label for="language"><fmt:message key="choose.language"/></label>
+                <select id="language" name="language">
+                    <option value="ru_RU">русский</option>
+                    <option value="en_EN">english</option>
+                </select>
+                <input type="submit" value="<fmt:message key="lang.button"/>" class="waves-effect waves-light btn"/>
+
+            </form>
+
+        </div>
+    </div>
 <br>
-<div align="center">
+    <div class="center-align">
     <form method="post" action="${pageContext.request.contextPath}">
         <label>
             <input hidden name="command" value="loginUser">
@@ -56,9 +68,16 @@
             </c:if>
         </div>
 
-        <input type="submit" value="<fmt:message key="login.button"/>"><br>
+        <input type="submit" value="<fmt:message key="login.button"/>" class="waves-effect waves-light btn"><br>
     </form>
 </div>
 <br>
+</div>
+<script type="text/javascript">
+    document.addEventListener('DOMContentLoaded', function () {
+        var elems = document.querySelectorAll('select');
+        var instances = M.FormSelect.init(elems);
+    });
+</script>
 </body>
 </html>

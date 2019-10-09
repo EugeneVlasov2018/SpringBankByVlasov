@@ -15,6 +15,7 @@
 <html>
 <head>
     <title>Title</title>
+    <jsp:include page="setup.jsp"/>
 </head>
 <body>
 <div align="center">
@@ -28,7 +29,7 @@
 </c:if>
 <br>
 <form action="${pageContext.request.contextPath}userpage/createaccount" method="get">
-    <input type="submit" value="<fmt:message key="create.new.acc"/> ">
+    <input type="submit" value="<fmt:message key="create.new.acc"/> " class="waves-effect waves-light btn"/>
 </form>
 <fmt:message key="customer.deposit.accounts"/><br>
 <table>
@@ -51,8 +52,9 @@
             </td>
             <td>
                 <form action="${pageContext.request.contextPath}userpage/accountoperation" method="get">
-                    <input name="accountNumber" type="hidden" value="${depAcc.accountNumber}">
-                    <input type="submit" value="<fmt:message key="account.details"/>"/>
+                    <input name="accountNumber" type="hidden" value="${depAcc.accountNumber}"/>
+                    <input type="submit" value="<fmt:message key="account.details"/>"
+                           class="waves-effect waves-light btn-small"/>
                 </form>
             </td>
         </tr>
@@ -65,7 +67,7 @@
 </c:if>
 <c:if test="${empty requestScope.creditAccounts && sessionScope.user.creditRequestStatus==false}">
     <form action="${pageContext.request.contextPath}userpage/createcreditacc" method="get">
-        <input type="submit" value="<fmt:message key="button.account.request"/>"/>
+        <input type="submit" value="<fmt:message key="button.account.request"/>" class="waves-effect waves-light btn"/>
     </form>
 </c:if>
 <c:if test="${not empty requestScope.creditAccounts}">
@@ -90,8 +92,9 @@
                 </td>
                 <td>
                     <form action="${pageContext.request.contextPath}userpage/accountoperation" method="get">
-                        <input name="accountNumber" type="hidden" value="${credAcc.accountNumber}">
-                        <input type="submit" value="<fmt:message key="account.details"/>"/>
+                        <input name="accountNumber" type="hidden" value="${credAcc.accountNumber}"/>
+                        <input type="submit" value="<fmt:message key="account.details"/>"
+                               class="waves-effect waves-light btn-small"/>
                     </form>
                 </td>
             </tr>

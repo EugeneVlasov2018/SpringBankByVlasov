@@ -14,70 +14,86 @@
 <html>
 <head>
     <title>Title</title>
+    <jsp:include page="setup.jsp"/>
 </head>
 <body>
-<fmt:message key="account.number"/>
-<c:out value="${sessionScope.accountNumber}"/>
-<br>
-<br>
-<form action="${pageContext.request.contextPath}workwithaccount" method="get">
-    <label>
-        <input name="typeofwork" type="radio" value="addmoney" required checked>
-    </label>
-    <fmt:message key="addmoney"/>
+<div class="container">
+    <fmt:message key="account.number"/>
+    <c:out value="${sessionScope.accountNumber}"/>
+    <br/>
+    <br/>
+    <form action="${pageContext.request.contextPath}workwithaccount" method="get">
+
+        <div class="row">
+            <div class="col s12">
+                <label>
+                    <input name="typeofwork" type="radio" value="addmoney" required checked/>
+                    <span><fmt:message key="addmoney"/></span>
+                </label>
+            </div>
+            <div class="col s12">
+                <label>
+                    <input name="typeofwork" type="radio" value="sendmoney" required/>
+                    <span><fmt:message key="sending.money"/></span>
+                </label>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col s12">
+                <input type="submit" value="<fmt:message key="button.workwithacc"/>"
+                       class="waves-effect waves-light btn"/>
+            </div>
+        </div>
+    </form>
     <br>
-    <label>
-        <input name="typeofwork" type="radio" value="sendmoney" required>
-    </label>
-    <fmt:message key="sending.money"/>
-    <br>
-    <input type="submit" value="<fmt:message key="button.workwithacc"/>">
-</form>
-<br>
-<table>
-    <tr>
-        <th><fmt:message key="acc.date.of.transaction"/></th>
-        <th><fmt:message key="acc.transaction.amount"/></th>
-        <th><fmt:message key="acc.current.balance"/></th>
-        <th><fmt:message key="acc.notification"/></th>
-    </tr>
-    <c:forEach items="${requestScope.history}" var="acc">
+    <table>
         <tr>
-
-            <td><customTag:customDate localDateTime="${acc.dateOfTransaction}"/></td>
-            <td>${acc.transactionAmount}</td>
-            <td>${acc.currentBalance}</td>
-            <td>${acc.notification}</td>
+            <th><fmt:message key="acc.date.of.transaction"/></th>
+            <th><fmt:message key="acc.transaction.amount"/></th>
+            <th><fmt:message key="acc.current.balance"/></th>
+            <th><fmt:message key="acc.notification"/></th>
         </tr>
-    </c:forEach>
-</table>
-<br>
-<c:if test="${requestScope.currentPage != 1}">
-    <td><a href="accountoperation?page=${requestScope.currentPage - 1}"><fmt:message key="previous"/></a></td>
-</c:if>
+        <c:forEach items="${requestScope.history}" var="acc">
+            <tr>
 
-<table>
-    <tr>
+                <td><customTag:customDate localDateTime="${acc.dateOfTransaction}"/></td>
+                <td>${acc.transactionAmount}</td>
+                <td>${acc.currentBalance}</td>
+                <td>${acc.notification}</td>
+            </tr>
+        </c:forEach>
+    </table>
+    <br>
+
+    <div class="row">
+        <div class="col s3">
+            <c:if test="${requestScope.currentPage != 1}">
+                <a href="accountoperation?page=${requestScope.currentPage - 1}"><fmt:message key="previous"/></a>
+            </c:if>
+        </div>
         <c:forEach begin="1" end="${requestScope.numberOfPage}" var="i">
             <c:choose>
                 <c:when test="${requestScope.currentPage eq i}">
-                    <td>${i}</td>
+                    <div class="col s1">${i}</div>
                 </c:when>
                 <c:otherwise>
-                    <td><a href="accountoperation?page=${i}">${i}</a></td>
+                    <div class="col s1"><a href="accountoperation?page=${i}">${i}</a></div>
                 </c:otherwise>
             </c:choose>
         </c:forEach>
-    </tr>
-</table>
 
-<c:if test="${requestScope.currentPage lt requestScope.numberOfPage}">
-    <td><a href="accountoperation?page=${requestScope.currentPage + 1}"><fmt:message key="next"/></a></td>
-</c:if>
-<br>
-<c:out value="${requestScope.exceptionError}"/>
-<br>
-<br>
-<jsp:include page="logout.jsp"/>
+        <div class="col s3">
+            <c:if test="${requestScope.currentPage lt requestScope.numberOfPage}">
+                <a href="accountoperation?page=${requestScope.currentPage + 1}"><fmt:message key="next"/></a>
+            </c:if>
+        </div>
+    </div>
+    <br>
+    <c:out value="${requestScope.exceptionError}"/>
+    <br>
+    <br>
+    <jsp:include page="logout.jsp"/>
+</div>
 </body>
 </html>
