@@ -9,7 +9,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@taglib uri="/WEB-INF/mytag.tld" prefix="customTag" %>
-<fmt:setLocale value="${sessionScope.currentLang}" scope="session"/>
+<fmt:setLocale value="${sessionScope.currentLang}"/>
 <fmt:setBundle basename="pages/userpage"/>
 
 <html>
@@ -19,7 +19,7 @@
 </head>
 <body>
 <div align="center">
-    <fmt:message key="greeting.user"/> <!--Обьеденить 2 тега в1 кастомный!!!-->
+    <fmt:message key="greeting.user"/>
     <c:out value="${sessionScope.user.firstName} ${sessionScope.user.lastName}))"/>
 </div>
 <br>

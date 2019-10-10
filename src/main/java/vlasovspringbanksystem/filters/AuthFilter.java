@@ -22,7 +22,9 @@ public class AuthFilter implements Filter {
         HttpServletResponse response = (HttpServletResponse) servletResponse;
         HttpSession session = request.getSession();
         User userFromSession = (User) session.getAttribute("user");
-        if (!request.getRequestURI().equals("/changelang")) {
+        if (request.getRequestURI().startsWith("/changelang") || (request.getRequestURI().contains("/logout"))) {
+            filterChain.doFilter(servletRequest, servletResponse);
+        } else {
             if (userFromSession != null) {
                 if (request.getRequestURI().startsWith("/userpage")) {
                     if (userFromSession.getRole().getUserRoleValue().equals("user"))
@@ -34,9 +36,6 @@ public class AuthFilter implements Filter {
                         filterChain.doFilter(servletRequest, servletResponse);
                     else
                         response.sendRedirect("/userpage");
-                } else {
-                    //response.sendRedirect("/");
-                    request.getRequestDispatcher(INDEX_PAGE).forward(servletRequest, servletResponse);
                 }
             } else {
                 String login = request.getParameter("login");
@@ -45,14 +44,9 @@ public class AuthFilter implements Filter {
                 if (login != null && password != null) {
                     filterChain.doFilter(servletRequest, servletResponse);
                 } else {
-                    if (request.getRequestURI().equals("/"))
-                        request.getRequestDispatcher(INDEX_PAGE).forward(request, response);
-                    else
-                        response.sendRedirect("/");
+                    request.getRequestDispatcher(INDEX_PAGE).forward(request, response);
                 }
             }
-        } else {
-            filterChain.doFilter(servletRequest, servletResponse);
         }
     }
 }

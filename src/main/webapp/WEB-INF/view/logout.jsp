@@ -7,10 +7,10 @@
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" pageEncoding="UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
-<fmt:setLocale value="${sessionScope.currentLang}" scope="session"/>
+<fmt:setLocale value="${sessionScope.currentLang}"/>
 <fmt:setBundle basename="pages/logout"/>
 
 
-<form action="${pageContext.request.contextPath}logout" method="post">
+<form action="/logout" method="post">
     <input type="submit" value="<fmt:message key="logout.button"/>" class="waves-effect waves-light btn-small"/>
 </form>

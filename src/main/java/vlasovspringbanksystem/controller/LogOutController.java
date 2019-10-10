@@ -11,9 +11,7 @@ public class LogOutController {
 
     @PostMapping("/logout")
     public String logout(HttpSession session) {
-        System.out.println("before " + session);
         session.invalidate();
-        System.out.println("after " + session);
         return INDEXPAGE;
     }
 }

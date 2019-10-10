@@ -15,7 +15,7 @@
     <fmt:setLocale value="${sessionScope.currentLang}" scope="session"/>
 </c:if>
 <c:if test="${empty sessionScope.currentLang}">
-    <fmt:setLocale value="en_EN" scope="session"/>
+    <fmt:setLocale value="en_US" scope="session"/>
 </c:if>
 <fmt:setBundle basename="pages/index"/>
 
@@ -39,8 +39,8 @@
 
                 <label for="language"><fmt:message key="choose.language"/></label>
                 <select id="language" name="language">
+                    <option value="en_US">english</option>
                     <option value="ru_RU">русский</option>
-                    <option value="en_EN">english</option>
                 </select>
                 <input type="submit" value="<fmt:message key="lang.button"/>" class="waves-effect waves-light btn"/>
 
