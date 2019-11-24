@@ -8,7 +8,7 @@ import vlasovspringbanksystem.service.UserService;
 import javax.servlet.http.HttpSession;
 import java.math.BigDecimal;
 
-@Controller//todo errors bigdecimal
+@Controller
 public class RefillAccountController {
     private UserService service;
     private final static String TO_CURRENT_ACC_HISTORY = "redirect:/userpage/accountoperation";

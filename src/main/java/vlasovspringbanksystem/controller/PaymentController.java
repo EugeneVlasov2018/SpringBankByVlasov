@@ -15,7 +15,7 @@ import javax.servlet.http.HttpSession;
 import java.math.BigDecimal;
 
 @Controller
-public class PaymentController {//todo errors BigDecimal
+public class PaymentController {
     private UserService service;
     private final static String TO_CURRENT_ACC_HISTORY = "redirect:/userpage/accountoperation";
     private final static String REFILL_ACCOUNT = "addmoneypage";
@@ -36,7 +36,7 @@ public class PaymentController {//todo errors BigDecimal
         return currentMenu;
     }
 
-    @PostMapping("/userpage/payment")//todo прописать валидатор на номер входящего аккаунта
+    @PostMapping("/userpage/payment")
     public String payment(HttpSession session,
                           Model model,
                           @RequestParam("typeOfTransaction") String typeOfTransaction,

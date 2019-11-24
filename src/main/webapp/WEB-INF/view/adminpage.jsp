@@ -14,7 +14,7 @@
 <html>
 <head>
     <title>Title</title>
-    <jsp:include page="setup.jsp"/>
+    <%@ include file="setup.jsp"%>
 </head>
 <body>
 <div class="container">

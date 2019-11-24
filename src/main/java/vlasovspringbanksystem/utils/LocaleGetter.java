@@ -10,7 +10,7 @@ public class LocaleGetter {
     public Locale getCurrentLocale(HttpSession session) {
         String localeData = (String) session.getAttribute("currentLang");
         if (localeData == null) {
-            localeData = "en_EN";
+            localeData = "en_US";
         }
         String[] languageAndCountry = localeData.split("_");
         return new Locale(languageAndCountry[0], languageAndCountry[1]);

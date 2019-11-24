@@ -1,6 +1,7 @@
 package vlasovspringbanksystem.entity;
 
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -10,6 +11,8 @@ import java.io.Serializable;
 @Entity
 @Table(name = "user_roles")
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class UserRole implements Serializable {
 
     @Id

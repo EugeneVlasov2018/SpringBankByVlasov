@@ -28,7 +28,7 @@ public class NewAccFromUserController {
         return NEW_DEPOSIT_ACC_PAGE;
     }
 
-    @PostMapping("userpage/createaccount")//todo реализовать валидатор на ненулевой депозит
+    @PostMapping("userpage/createaccount")
     public String createDepositAccPage(@RequestParam("deposit") String deposit,
                                        HttpSession session) {
         BigDecimal depositPal = new BigDecimal(deposit.replace(',', '.'));
